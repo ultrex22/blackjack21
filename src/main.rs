@@ -30,9 +30,10 @@ fn main() {
         if !players_out {
             dealer_turn(dealer, player, deck);
         } else {
-            println!("\n GAME OVER ")
+            //place holder
         }
     }
+    println!("\n GAME OVER ")
 }
 
 fn players_turn(player: &mut Player, dealer: &mut Dealer, deck: &mut Deck) -> bool {
