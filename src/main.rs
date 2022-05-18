@@ -15,16 +15,23 @@ mod players;
 use crate::deck::Deck;
 use crate::players::*;
 
-// test
 fn main() {
     let mut deck = Deck::new();
     deck.shuffle_cards();
     let mut dealer = Dealer::new();
     let mut player = Player::new();
     deck.start_game(&mut dealer, &mut player);
-    let players_out = players_turn(&mut player, &mut dealer, &mut deck);
-    if !players_out {
-        dealer_turn(dealer, player, deck);
+
+    if player.hand_total() == 21 {
+        println!("Player was dealt BlackJack!")
+    } else {
+        let players_out = players_turn(&mut player, &mut dealer, &mut deck);
+
+        if !players_out {
+            dealer_turn(dealer, player, deck);
+        } else {
+            println!("\n GAME OVER ")
+        }
     }
 }
 
@@ -75,10 +82,10 @@ fn dealer_turn(mut dealer: Dealer, player: Player, mut deck: Deck) {
             println!("Player wins, BlackJack!")
         }
         total if total > dealer_total => {
-            println!("Dealer wins!");
+            println!("Player wins!");
         }
         total if total < dealer_total => {
-            println!("Player wins!");
+            println!("Dealer wins!");
         }
         _ => {
             println!("Tie!")
