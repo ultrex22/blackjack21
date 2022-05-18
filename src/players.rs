@@ -1,5 +1,4 @@
-use crate::deck::{Card, Deck};
-use std::fmt::{Display, Formatter};
+use crate::deck::Card;
 
 #[derive(Debug)]
 pub struct Dealer {
@@ -13,7 +12,7 @@ impl Dealer {
     pub fn show(&self) {
         println!("Dealers Card: <Face Down>");
         for card in &self.hand[1..] {
-            println!("Dealers Card:{}", card);
+            println!("Dealers Card: {}", card);
         }
     }
     pub fn hand_total(&self) -> u8 {

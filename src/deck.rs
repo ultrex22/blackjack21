@@ -1,5 +1,4 @@
-use crate::deck;
-use crate::{players, Dealer, Player};
+use crate::{Dealer, Player};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::fmt::{Display, Formatter};
