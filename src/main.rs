@@ -14,6 +14,7 @@ mod players;
 
 use crate::deck::Deck;
 use crate::players::*;
+use crossterm::style::Stylize;
 
 fn main() {
     let mut deck = Deck::new();
@@ -23,7 +24,7 @@ fn main() {
     deck.start_game(&mut dealer, &mut player);
 
     if player.hand_total() == 21 {
-        println!("Player was dealt BlackJack!")
+        println!("{}", "Player was dealt BlackJack!".red().on_black());
     } else {
         let players_out = players_turn(&mut player, &mut dealer, &mut deck);
 
@@ -33,7 +34,7 @@ fn main() {
             //place holder
         }
     }
-    println!("\n GAME OVER ")
+    println!("\n{}", "GAME OVER".green().on_dark_grey());
 }
 
 fn players_turn(player: &mut Player, dealer: &mut Dealer, deck: &mut Deck) -> bool {
