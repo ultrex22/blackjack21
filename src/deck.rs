@@ -1,7 +1,14 @@
-use crate::{Dealer, Player};
+use crossterm::cursor::MoveTo;
+use std::fmt::{Display, Formatter};
+use std::io::stdout;
+
+use crossterm::execute;
+use crossterm::style::Stylize;
+use crossterm::terminal::{Clear, ClearType};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use std::fmt::{Display, Formatter};
+
+use crate::{Dealer, Player};
 
 const SUITS: [&str; 4] = ["Hearts", "Spades", "Clubs", "Diamonds"];
 const FACE: [(&str, u8); 13] = [
@@ -56,14 +63,16 @@ impl Deck {
         player.hand.push(self.next_card());
         player.hand.push(self.next_card());
         dealer.show();
+        println!();
         player.show();
     }
     pub fn next_card(&mut self) -> Card {
-        let card = self.deck.pop().unwrap();
-        card
+        self.deck.pop().unwrap()
     }
     pub fn shuffle_cards(&mut self) {
-        println!("shuffling...");
+        let _res = execute!(stdout(), Clear(ClearType::All), MoveTo(0, 10));
+        println!("{}", "shuffling...".green());
+        println!();
         let mut rng = thread_rng();
         self.deck.shuffle(&mut rng);
         self.deck.shuffle(&mut rng);
@@ -72,8 +81,9 @@ impl Deck {
 
 impl Display for Deck {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        Ok(for card in &self.deck {
-            write!(f, "{} of {}.\n", card.face.0, card.suit)?;
-        })
+        for card in &self.deck {
+            writeln!(f, "{} of {}.", card.face.0, card.suit)?;
+        }
+        Ok(())
     }
 }

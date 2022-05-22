@@ -6,15 +6,20 @@
 // If you are dealt 21 from the start (Ace & 10), you got a blackjack.
 // Dealer will hit until his/her cards total 17 or higher.
 
-// todo: add color to terminal or similar??
 //  todo: add betting???
 
-mod deck;
-mod players;
+use std::io::stdout;
+
+use crossterm::execute;
+use crossterm::style::Print;
+use crossterm::style::Stylize;
+use crossterm::style::{Color, ResetColor, SetForegroundColor};
 
 use crate::deck::Deck;
 use crate::players::*;
-use crossterm::style::Stylize;
+
+mod deck;
+mod players;
 
 fn main() {
     let mut deck = Deck::new();
@@ -24,7 +29,7 @@ fn main() {
     deck.start_game(&mut dealer, &mut player);
 
     if player.hand_total() == 21 {
-        println!("{}", "Player was dealt BlackJack!".red().on_black());
+        println!("{}", "Player was dealt BlackJack!".magenta());
     } else {
         let players_out = players_turn(&mut player, &mut dealer, &mut deck);
 
@@ -34,28 +39,30 @@ fn main() {
             //place holder
         }
     }
-    println!("\n{}", "GAME OVER".green().on_dark_grey());
+    println!("\n{}", "GAME OVER".green());
 }
 
 fn players_turn(player: &mut Player, dealer: &mut Dealer, deck: &mut Deck) -> bool {
     let mut player_over = false;
+
     loop {
-        println!("\nDo you want Another card or Hold? (A or H): ");
+        println!(
+            "{}",
+            "\nDo you want Another card or Hold? (A or H): ".green()
+        );
+
         let mut buffer = String::new();
         std::io::stdin().read_line(&mut buffer).unwrap();
         let another = buffer.trim().to_lowercase();
+
         if &another[..] == "a" {
             player.hand.push(deck.next_card());
             player.show();
             println!();
             match player.hand_total() {
                 over if over > 21 => {
-                    println!("Player has gone over, Dealer wins!");
-                    println!(
-                        "Dealer Total: {:?}, Player Total: {:?}",
-                        dealer.hand_total(),
-                        player.hand_total()
-                    );
+                    println!("{}", "Player has gone over, Dealer wins!".yellow());
+                    game_totals(player, dealer);
                     player_over = true;
                     break;
                 }
@@ -68,34 +75,46 @@ fn players_turn(player: &mut Player, dealer: &mut Dealer, deck: &mut Deck) -> bo
     player_over
 }
 
-fn dealer_turn(mut dealer: Dealer, player: Player, mut deck: Deck) {
+fn game_totals(player: &mut Player, dealer: &mut Dealer) {
+    let _res = execute!(
+        stdout(),
+        SetForegroundColor(Color::Magenta),
+        Print("\n"),
+        Print("Dealer Total: ".to_string()),
+        Print(dealer.hand_total()),
+        Print(", "),
+        Print("Player Total: ".to_string()),
+        Print(player.hand_total()),
+        Print("\n"),
+        ResetColor
+    );
+}
+
+fn dealer_turn(mut dealer: Dealer, mut player: Player, mut deck: Deck) {
     while dealer.hand_total() <= 17 {
-        println!("Dealer takes a card...");
+        println!("{}", "Dealer takes a card...".yellow());
         dealer.hand.push(deck.next_card())
     }
-    println!("Dealer stays...");
+    println!("{}", "Dealer stays...".yellow());
     let dealer_total = dealer.hand_total();
 
     match player.hand_total() {
         _x if dealer.hand_total() > 21 => {
-            println!("Dealer has gone over, Player wins!")
+            println!("{}", "Dealer has gone over, Player wins!".blue())
         }
         total if total == 21 => {
-            println!("Player wins, BlackJack!")
+            println!("{}", "Player wins, BlackJack!".blue())
         }
         total if total > dealer_total => {
-            println!("Player wins!");
+            println!("{}", "Player wins!".blue());
         }
         total if total < dealer_total => {
-            println!("Dealer wins!");
+            println!("{}", "Dealer wins!".yellow());
         }
         _ => {
-            println!("Tie!")
+            println!("{}", "Tie!".green())
         }
     }
-    println!(
-        "Dealer Total: {:?}, Player Total: {:?}",
-        dealer_total,
-        player.hand_total()
-    );
+
+    game_totals(&mut player, &mut dealer);
 }

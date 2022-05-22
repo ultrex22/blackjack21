@@ -1,3 +1,9 @@
+use std::io::stdout;
+
+use crossterm::style::Stylize;
+use crossterm::style::{Color, ResetColor, SetForegroundColor};
+use crossterm::{execute, style::Print};
+
 use crate::deck::Card;
 
 #[derive(Debug)]
@@ -10,11 +16,19 @@ impl Dealer {
         Self { hand: Vec::new() }
     }
     pub fn show(&self) {
-        println!("Dealers Card: <Face Down>");
+        println!("{}", "Dealers Card: <Face Down>".yellow());
         for card in &self.hand[1..] {
-            println!("Dealers Card: {}", card);
+            let _res = execute!(
+                stdout(),
+                SetForegroundColor(Color::Yellow),
+                Print("Dealers Card: ".to_string()),
+                Print(card),
+                Print("\n"),
+                ResetColor
+            );
         }
     }
+
     pub fn hand_total(&self) -> u8 {
         let total: u8 = self.hand.iter().map(|card| card.face.1).sum();
         total
@@ -32,7 +46,14 @@ impl Player {
     }
     pub fn show(&self) {
         for card in &self.hand {
-            println!("Your Card: {}", card);
+            let _res = execute!(
+                stdout(),
+                SetForegroundColor(Color::Blue),
+                Print("Your Card: ".to_string()),
+                Print(card),
+                Print("\n"),
+                ResetColor
+            );
         }
     }
     pub fn hand_total(&self) -> u8 {
