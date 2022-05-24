@@ -10,7 +10,7 @@ use rand::thread_rng;
 
 use crate::{Dealer, Player};
 
-const SUITS: [&str; 4] = ["Hearts", "Spades", "Clubs", "Diamonds"];
+const SUITS: [char; 4] = ['\u{2660}', '\u{2663}', '\u{2665}', '\u{2666}'];
 const FACE: [(&str, u8); 13] = [
     ("2", 2),
     ("3", 3),
@@ -30,7 +30,7 @@ const FACE: [(&str, u8); 13] = [
 #[derive(Debug)]
 pub struct Card {
     pub(crate) face: (String, u8),
-    pub(crate) suit: String,
+    pub(crate) suit: char,
 }
 
 impl Display for Card {
@@ -51,7 +51,7 @@ impl Deck {
             for f in FACE {
                 full_deck.push(Card {
                     face: (f.0.to_owned(), f.1),
-                    suit: s.to_owned(),
+                    suit: s,
                 });
             }
         }
@@ -60,10 +60,11 @@ impl Deck {
     pub fn start_game(&mut self, dealer: &mut Dealer, player: &mut Player) {
         dealer.hand.push(self.next_card());
         dealer.hand.push(self.next_card());
-        player.hand.push(self.next_card());
-        player.hand.push(self.next_card());
         dealer.show();
         println!();
+
+        player.hand.push(self.next_card());
+        player.hand.push(self.next_card());
         player.show();
     }
     pub fn next_card(&mut self) -> Card {
